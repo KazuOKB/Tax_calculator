@@ -31,7 +31,7 @@ def integrate(sigma, rho, beta, dt, tmax, initial_state):
         traj[i] = [t, *s]
     return traj
 
-st.title("Lorenz 系 可視化アプリ")
+st.title("Lorenz 方程式 可視化アプリ")
 
 # サイドバーでパラメータを受け取る
 #sigma = st.sidebar.slider("σ", 0.0, 50.0, 10.0, step=0.1)
