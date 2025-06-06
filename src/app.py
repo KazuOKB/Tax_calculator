@@ -19,33 +19,41 @@ if st.button("税率、税金の計算"):
     salary_net = salary - salary_deduction
     # 全所得(控除後給与所得 + 雑所得)
     total_income = salary_net + misc_income
-    # 基礎控除と社会保険料等を除いたものが課税所得
+
+    # 基礎控除と社会保険料等を除いたものが課税所得（普通は48万円）
     basic_deduction = 480000
     taxable = total_income - (insurance + basic_deduction)
+
+    # 住民税用の課税所得（住民税に対する基礎控除は43万円）
+    basic_deduction_resident= 430000
+    taxable_resident = total_income - (insurance + basic_deduction_resident)
+
     # 真の課税所得
     # 1000円未満を切り捨てる(一応負の値も対処)
     taxable = int(max(0, taxable // 1000 * 1000))
+    taxable_resident = int(max(0, taxable_resident // 1000 * 1000))
     # 所得税率と所得税控除額の算出
     tax_rate, tax_deduction = determine_tax_rate(taxable)
+    tax_rate_resident, tax_deduction_resident = determine_tax_rate(taxable_resident) 
     # 所得税の計算
     income_tax = int(taxable * tax_rate - tax_deduction)
+    # 住民税
+    resident_tax = int(taxable_resident * (resident_rate / 100))
     # 復興特別所得税(所得税×2.1%)
     surcharge = int(income_tax * 0.021)
     # 合計所得税(源泉徴収相当)
     total_income_tax   = income_tax + surcharge
-    # 住民税
-    resident_tax = int(taxable * (resident_rate / 100))
 
     st.header("計算結果")
     
     st.subheader("・控除額に関して")
     st.write(f"給与所得控除後の金額: {format_num(int(salary_net))} 円")
-    st.write(f"所得控除額 (基礎控除や保険料): {format_num(insurance + basic_deduction)} 円")
-    st.write(f"課税所得: {format_num(taxable)} 円")
 
     out1, out2 = st.columns(2)
     with out1:
         st.subheader("・所得税")
+        st.write(f"所得控除額 (基礎控除や保険料): {format_num(insurance + basic_deduction)} 円")
+        st.write(f"課税所得: {format_num(taxable)} 円")
         st.write(f"税率: {tax_rate*100:.1f}%")
         st.write(f"所得税控除額 {format_num(tax_deduction)} 円")
         st.write(f"所得税: {format_num(income_tax)} 円")
@@ -54,6 +62,8 @@ if st.button("税率、税金の計算"):
 
     with out2:
         st.subheader("・住民税")
+        st.write(f"所得控除額 (基礎控除や保険料): {format_num(insurance + basic_deduction_resident)} 円")
+        st.write(f"課税所得: {format_num(taxable_resident)} 円")
         st.write(f"住民税率: {resident_rate:.1f}％")
         st.write(f"住民税額: {format_num(resident_tax)} 円")
 
